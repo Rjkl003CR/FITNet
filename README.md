@@ -40,7 +40,7 @@ The Next.js frontend provides the user interface, while the Java Gateway connect
 
 ### Architecture Diagram
 
-``
+```
                      FITNet USERS
                           |
                      Web Browser
@@ -72,7 +72,7 @@ The Next.js frontend provides the user interface, while the Java Gateway connect
                                     Port 1100
                                         |
                                   URL Connections
-``
+```
 
 ### How It Works
 
@@ -131,7 +131,7 @@ The initial implementation uses in-memory Java collections. A database is not re
 
 ## 4. Project Structure
 
-``
+```
 FITNet/
 │
 ├── frontend/
@@ -158,7 +158,7 @@ FITNet/
 ├── database/
 ├── docs/
 └── README.md
-`
+```
 
 ### Backend Module Responsibilities
 
@@ -290,7 +290,7 @@ Where appropriate, modules can use a common JSON message structure.
 
 Example:
 
-``json
+```json
 {
   "messageId": "unique-message-id",
   "type": "PRIVATE_MESSAGE",
@@ -301,7 +301,7 @@ Example:
   "content": "Hello! Welcome to FITNet.",
   "timestamp": "2026-11-13T10:30:00Z"
 }
-`
+```
 
 | Field | Description |
 |---|---|
@@ -418,14 +418,14 @@ FITNet uses GitHub for collaborative development.
 
 Example:
 
-``bash
+```bash
 git switch feature/tcp_messaging
 git pull origin feature/tcp_messaging
 
 git add .
 git commit -m "Implement TCP messaging functionality"
 git push origin feature/tcp_messaging
-``
+```
 
 Do not push unfinished feature work directly to `main`.
 
