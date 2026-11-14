@@ -6,21 +6,28 @@ import type { ChatMessage } from "@/types/chat";
 
 const currentUser = { id: "alex-perera", name: "Alex Perera" };
 
-export function useChat(initialMessages: ChatMessage[]) {
-  const [messages, setMessages] = useState(initialMessages);
+export function useChat() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [status, setStatus] = useState<GatewayStatus>(isGatewayConfigured ? "connecting" : "disconnected");
   const gateway = useRef<ChatGateway | null>(null);
+  const upsertMessage = useCallback((message: ChatMessage, delivery?: ChatMessage["delivery"]) => {
+    setMessages((current) => {
+      const next = current.filter((item) => item.messageId !== message.messageId);
+      const existing = current.find((item) => item.messageId === message.messageId);
+      return [...next, { ...existing, ...message, delivery: delivery ?? message.delivery ?? existing?.delivery }];
+    });
+  }, []);
 
   useEffect(() => {
     if (!isGatewayConfigured) return;
     const service = new ChatGateway({
       onStatusChange: setStatus,
-      onMessage: (message) => setMessages((current) => [...current, message]),
+      onMessage: (message) => upsertMessage(message, "sent"),
     });
     gateway.current = service;
     service.connect();
     return () => service.disconnect();
-  }, []);
+  }, [upsertMessage]);
 
   const sendMessage = useCallback((content: string, receiverId: string | null, groupId: string | null) => {
     const message: ChatMessage = {
@@ -34,17 +41,13 @@ export function useChat(initialMessages: ChatMessage[]) {
       timestamp: new Date().toISOString(),
       delivery: "sending",
     };
-    setMessages((current) => [...current, message]);
+    upsertMessage(message);
     if (gateway.current?.send(message)) {
-      setMessages((current) =>
-        current.map((item) => (item.messageId === message.messageId ? { ...item, delivery: "sent" } : item)),
-      );
+      upsertMessage(message, "sent");
     } else {
-      setMessages((current) =>
-        current.map((item) => (item.messageId === message.messageId ? { ...item, delivery: "failed" } : item)),
-      );
+      upsertMessage(message, "failed");
     }
-  }, []);
+  }, [upsertMessage]);
 
   return { messages, status, sendMessage };
 }

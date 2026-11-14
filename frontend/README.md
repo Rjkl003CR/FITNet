@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FITNet Frontend
 
-## Getting Started
+Next.js frontend for the FITNet collaboration platform.
 
-First, run the development server:
+## Run locally
 
-```bash
+From `C:\FITNet\FITNet\frontend`:
+
+```powershell
+npm install
+Copy-Item .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Available routes:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` - TCP Messaging
+- `/presence` - UDP Presence
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+Copy `.env.example` to `.env.local` and update the values for your Gateway:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+NEXT_PUBLIC_GATEWAY_WS_URL=ws://localhost:8080/ws/chat
+NEXT_PUBLIC_PRESENCE_API_BASE_URL=http://localhost:8080
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`NEXT_PUBLIC_GATEWAY_WS_URL` is used by the browser WebSocket client. The
+frontend never opens a Java TCP socket directly; the Java Gateway owns the
+WebSocket-to-TCP bridge.
 
-## Deploy on Vercel
+`NEXT_PUBLIC_PRESENCE_API_BASE_URL` is used for:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+GET /api/presence/users
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The Presence response must be a JSON array containing `userId`, `status`
+(`ONLINE` or `OFFLINE`), and an ISO-8601 `lastSeen` value.
+
+## TCP Messaging
+
+The messaging screen connects to the Gateway when
+`NEXT_PUBLIC_GATEWAY_WS_URL` is configured. It:
+
+- Displays connection state and reconnects after unexpected disconnects.
+- Validates incoming message payloads before rendering them.
+- Builds conversations from messages received from the Gateway.
+- Sends private and group messages using the shared message shape.
+- Keeps the composer disabled while the Gateway is offline.
+
+Expected message shape:
+
+```json
+{
+  "messageId": "UUID",
+  "type": "PRIVATE_MESSAGE",
+  "senderId": "user-id",
+  "senderName": "User Name",
+  "receiverId": "receiver-id",
+  "groupId": null,
+  "content": "Hello!",
+  "timestamp": "2026-11-14T10:00:00Z"
+}
+```
+
+## UDP Presence
+
+The Presence page polls the Gateway every five seconds. The browser does not
+send raw UDP packets. The Java Presence server and Gateway must be running
+before the page can show users.
+
+## Checks and production run
+
+```powershell
+npm run lint
+npx tsc --noEmit
+npm run build
+npm run start
+```
+
+`npm run start` serves the production build at
+[http://localhost:3000](http://localhost:3000).
