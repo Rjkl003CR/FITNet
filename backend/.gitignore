@@ -1,0 +1,12 @@
+secure-transfer/certs/
+secure-transfer/storage/
+**/target/
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.key
+*.pem
+*.crt
+*.cer
+*.part
