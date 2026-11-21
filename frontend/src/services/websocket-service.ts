@@ -18,6 +18,12 @@ function isChatMessage(value: unknown): value is ChatMessage {
     typeof message.senderName === "string" &&
     typeof message.content === "string" &&
     typeof message.timestamp === "string" &&
+     (message.attachment === undefined || (
+       typeof message.attachment === "object" &&
+       typeof (message.attachment as Record<string, unknown>).name === "string" &&
+       typeof (message.attachment as Record<string, unknown>).type === "string" &&
+       typeof (message.attachment as Record<string, unknown>).size === "number"
+     )) &&
     (message.type === "PRIVATE_MESSAGE" || message.type === "GROUP_MESSAGE" || message.type === "SYSTEM")
   );
 }

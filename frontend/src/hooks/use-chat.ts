@@ -2,12 +2,35 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatGateway, type GatewayStatus, isGatewayConfigured } from "@/services/websocket-service";
-import type { ChatMessage } from "@/types/chat";
+import type { ChatAttachment, ChatMessage } from "@/types/chat";
 
-const currentUser = { id: "alex-perera", name: "Alex Perera" };
+const currentUser = { id: "kasun-perera", name: "Kasun Perera" };
 
 export function useChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      messageId: "sample-networking-1",
+      type: "PRIVATE_MESSAGE",
+      senderId: "chamathka-ranathunga",
+      senderName: "Chamathka Ranathunga",
+      receiverId: "kasun-perera",
+      groupId: null,
+      content: "Are you joining the group study session later?",
+      timestamp: "2026-11-21T14:30:00+05:30",
+      delivery: "delivered",
+    },
+    {
+      messageId: "sample-networking-2",
+      type: "PRIVATE_MESSAGE",
+      senderId: "kasun-perera",
+      senderName: "Kasun Perera",
+      receiverId: "chamathka-ranathunga",
+      groupId: null,
+      content: "Yes, I'll be there after my lecture.",
+      timestamp: "2026-11-21T14:32:00+05:30",
+      delivery: "read",
+    },
+  ]);
   const [status, setStatus] = useState<GatewayStatus>(isGatewayConfigured ? "connecting" : "disconnected");
   const gateway = useRef<ChatGateway | null>(null);
   const upsertMessage = useCallback((message: ChatMessage, delivery?: ChatMessage["delivery"]) => {
@@ -29,7 +52,7 @@ export function useChat() {
     return () => service.disconnect();
   }, [upsertMessage]);
 
-  const sendMessage = useCallback((content: string, receiverId: string | null, groupId: string | null) => {
+  const sendMessage = useCallback((content: string, receiverId: string | null, groupId: string | null, attachment?: ChatAttachment) => {
     const message: ChatMessage = {
       messageId: crypto.randomUUID(),
       type: groupId ? "GROUP_MESSAGE" : "PRIVATE_MESSAGE",
@@ -40,6 +63,7 @@ export function useChat() {
       content,
       timestamp: new Date().toISOString(),
       delivery: "sending",
+      attachment,
     };
     upsertMessage(message);
     if (gateway.current?.send(message)) {
@@ -49,5 +73,8 @@ export function useChat() {
     }
   }, [upsertMessage]);
 
-  return { messages, status, sendMessage };
+  const disconnect = useCallback(() => gateway.current?.disconnect(), []);
+  const reconnect = useCallback(() => gateway.current?.connect(), []);
+
+  return { messages, status, sendMessage, disconnect, reconnect };
 }

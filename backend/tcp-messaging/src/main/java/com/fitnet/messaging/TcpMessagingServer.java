@@ -29,7 +29,7 @@ public final class TcpMessagingServer implements AutoCloseable {
     private ServerSocket serverSocket;
 
     public TcpMessagingServer(int port) {
-        if (port < 1 || port > 65535) throw new IllegalArgumentException("Port must be between 1 and 65535.");
+        if (port < 0 || port > 65535) throw new IllegalArgumentException("Port must be between 0 and 65535.");
         this.port = port;
     }
 
@@ -37,7 +37,7 @@ public final class TcpMessagingServer implements AutoCloseable {
         if (running) throw new IllegalStateException("TCP messaging server is already running.");
         serverSocket = new ServerSocket(port);
         running = true;
-        System.out.println("FITNet TCP messaging server listening on port " + port);
+        System.out.println("FITNet TCP messaging server listening on port " + serverSocket.getLocalPort());
         while (running) {
             try {
                 Socket socket = serverSocket.accept();
@@ -48,6 +48,16 @@ public final class TcpMessagingServer implements AutoCloseable {
                 if (running) System.err.println("TCP accept failed: " + error.getMessage());
             }
         }
+    }
+
+    public int getPort() {
+        ServerSocket socket = serverSocket;
+        return socket == null ? port : socket.getLocalPort();
+    }
+
+    public int getConnectedClientCount() {
+        clients.removeIf(client -> !client.isConnected());
+        return clients.size();
     }
 
     private void broadcast(String message) {
@@ -71,6 +81,14 @@ public final class TcpMessagingServer implements AutoCloseable {
         TcpMessagingServer server = new TcpMessagingServer(port);
         Runtime.getRuntime().addShutdownHook(new Thread(server::close));
         server.start();
+    }
+
+    void startUnchecked() {
+        try {
+            start();
+        } catch (IOException error) {
+            if (running) throw new IllegalStateException("TCP messaging server failed.", error);
+        }
     }
 
     private final class Client implements Runnable, AutoCloseable {
@@ -107,6 +125,10 @@ public final class TcpMessagingServer implements AutoCloseable {
                 close();
                 return false;
             }
+        }
+
+        private boolean isConnected() {
+            return socket.isConnected() && !socket.isClosed();
         }
 
         @Override

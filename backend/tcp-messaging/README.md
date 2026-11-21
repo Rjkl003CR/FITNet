@@ -15,3 +15,16 @@ java -cp tcp-messaging\target\classes com.fitnet.messaging.TcpMessagingServer
 ```
 
 Use `-Dtcp.port=6000` to select another port.
+
+For direct Java TCP integration, use `TcpMessagingClient` with a
+line-delimited JSON message consumer:
+
+```java
+try (TcpMessagingClient client =
+             new TcpMessagingClient("localhost", 6000, System.out::println)) {
+    client.send("{\"messageId\":\"m1\",\"type\":\"PRIVATE_MESSAGE\","
+            + "\"senderId\":\"u1\",\"senderName\":\"Alex\","
+            + "\"receiverId\":\"u2\",\"groupId\":null,"
+            + "\"content\":\"Hello\",\"timestamp\":\"2026-11-21T18:55:31Z\"}");
+}
+```

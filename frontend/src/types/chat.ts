@@ -2,6 +2,13 @@ export type PresenceStatus = "online" | "away" | "offline";
 export type ConversationType = "direct" | "group";
 export type MessageDelivery = "sending" | "sent" | "delivered" | "read" | "failed";
 
+export interface ChatAttachment {
+  name: string;
+  type: string;
+  size: number;
+  dataUrl?: string;
+}
+
 export interface ChatMessage {
   messageId: string;
   type: "PRIVATE_MESSAGE" | "GROUP_MESSAGE" | "SYSTEM";
@@ -12,6 +19,7 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
   delivery?: MessageDelivery;
+  attachment?: ChatAttachment;
 }
 
 export interface ConversationMember {
