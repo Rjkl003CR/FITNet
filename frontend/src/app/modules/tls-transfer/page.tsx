@@ -1,0 +1,8 @@
+import { AppSidebar } from "@/components/layout/app-sidebar";
+import { TopNavbar } from "@/components/layout/top-navbar";
+
+export default function TlsTransferPage() {
+  return (
+    <main className="theme-bg flex min-h-screen"><AppSidebar /><section className="flex min-w-0 flex-1 flex-col"><TopNavbar title="TLS Secure Transfer" /><div className="overflow-y-auto p-4 lg:p-6"><div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-7"><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#2563EB]">Networking module</p><h1 className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">TLS Secure File Transfer</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">Demonstrates encrypted file transfer using Java networking.</p><div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">The backend module exists, but no browser file-transfer route is currently connected.</div><h2 className="mt-7 text-sm font-bold text-slate-900 dark:text-white">Testing instructions</h2><ol className="mt-3 space-y-2">{["Use the module Java application as documented.", "Verify certificates and TLS configuration.", "Do not place real confidential files in demonstrations."].map((instruction, index) => <li key={instruction} className="flex gap-3 text-sm text-slate-600 dark:text-slate-300"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-[#2563EB] dark:bg-blue-950/40">{index + 1}</span>{instruction}</li>)}</ol></div></div></section></main>
+  );
+}
