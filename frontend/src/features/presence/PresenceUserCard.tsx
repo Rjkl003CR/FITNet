@@ -4,7 +4,7 @@ import { PresenceStatus } from "./PresenceStatus";
 export function PresenceUserCard({ user }: { user: PresenceUser }) {
   const seen = new Date(user.lastSeen);
   return (
-    <li className="theme-card theme-border flex flex-wrap items-center gap-4 rounded-2xl border p-5">
+    <li className="flex flex-wrap items-center gap-4 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
       <div aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-zinc-100 font-mono text-sm font-semibold uppercase text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
         {user.userId.slice(0, 2)}
       </div>

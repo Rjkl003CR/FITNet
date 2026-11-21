@@ -63,7 +63,7 @@ export function PresenceDashboard() {
           { label: "Registered users", value: users?.length ?? "—" },
           { label: "Refresh interval", value: "5 seconds" },
         ].map(stat => (
-          <div key={stat.label} className="theme-card theme-border rounded-2xl border p-6">
+          <div key={stat.label} className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-sm text-zinc-500 dark:text-zinc-400">{stat.label}</p>
             <p className={`mt-3 text-3xl font-semibold tracking-tight ${stat.accent ? "text-emerald-700 dark:text-emerald-400" : ""}`}>{stat.value}</p>
           </div>
