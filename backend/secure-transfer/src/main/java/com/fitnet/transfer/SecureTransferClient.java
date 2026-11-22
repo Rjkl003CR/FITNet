@@ -36,10 +36,10 @@ public final class SecureTransferClient {
     static final int OP_UPLOAD = 1;
     static final int OP_DOWNLOAD = 2;
     static final int OP_LIST = 3;
-    static final int MAX_FILENAME_BYTES = 128;
+    static final int MAX_FILENAME_BYTES = 255;
     static final int MAX_HASH_BYTES = 64;
     static final int MAX_STATUS_BYTES = 1024;
-    static final long DEFAULT_MAX_FILE_BYTES = 100L * 1024 * 1024;
+    static final long DEFAULT_MAX_FILE_BYTES = 500L * 1024 * 1024;
     static final byte OK = 0;
     static final byte ERROR = 1;
     static final int BUFFER_SIZE = 64 * 1024;

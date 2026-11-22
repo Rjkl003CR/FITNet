@@ -5,7 +5,7 @@ export interface TransferFile {
 }
 
 const gateway = (process.env.NEXT_PUBLIC_GATEWAY_BASE_URL ?? "http://localhost:8080").replace(/\/$/, "");
-const fileNamePattern = /^[A-Za-z0-9][A-Za-z0-9._ -]{0,127}$/;
+const fileNamePattern = /^[A-Za-z0-9][A-Za-z0-9._ ()\[\],&'-]{0,254}$/;
 
 export function isSafeTransferFileName(value: string): boolean {
   return fileNamePattern.test(value) && value !== "." && value !== ".." && !/[. ]$/.test(value);
@@ -53,9 +53,9 @@ export async function fetchTransferFiles(signal?: AbortSignal): Promise<Transfer
 
 export async function uploadTransferFile(file: File, signal?: AbortSignal): Promise<TransferFile> {
   if (!isSafeTransferFileName(file.name)) {
-    throw new Error("Use a file name with up to 128 letters, numbers, spaces, dots, underscores, or hyphens.");
+    throw new Error("Use a file name with up to 255 safe ASCII characters without path separators.");
   }
-  if (file.size > 100 * 1024 * 1024) throw new Error("The upload limit is 100 MB.");
+  if (file.size > 500 * 1024 * 1024) throw new Error("The upload limit is 500 MB.");
   const response = await fetch(`${gateway}/api/files`, {
     method: "POST",
     signal,

@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
 /** Local HTTP bridge between the Next.js browser UI and the TLS file server. */
 public final class GatewayServer implements AutoCloseable {
     private static final int DEFAULT_PORT = 8080;
-    private static final long MAX_UPLOAD_BYTES = 100L * 1024 * 1024;
+    private static final long MAX_UPLOAD_BYTES = 500L * 1024 * 1024;
     private final int port;
     private final String frontendOrigin;
     private final SecureTransferClient transferClient;
@@ -75,7 +75,7 @@ public final class GatewayServer implements AutoCloseable {
                 json(exchange, 404, "{\"error\":\"Route not found\"}");
             }
         } catch (PayloadTooLargeException e) {
-            json(exchange, 413, "{\"error\":\"File exceeds the 100 MB upload limit\"}");
+            json(exchange, 413, "{\"error\":\"File exceeds the 500 MB upload limit\"}");
         } catch (TransferException e) {
             int status = switch (e.getMessage() == null ? "" : e.getMessage()) {
                 case "File not found" -> 404;
@@ -144,10 +144,10 @@ public final class GatewayServer implements AutoCloseable {
     }
 
     private static void validateUploadFileName(String fileName) {
-        if (!fileName.matches("[A-Za-z0-9][A-Za-z0-9._ -]{0,127}")
+        if (!fileName.matches("[A-Za-z0-9][A-Za-z0-9._ ()\\[\\],&'-]{0,254}")
                 || fileName.equals(".") || fileName.equals("..")
                 || fileName.endsWith(".") || fileName.endsWith(" ")) {
-            throw new IllegalArgumentException("File name must be 1-128 safe ASCII characters without path separators");
+            throw new IllegalArgumentException("File name must be 1-255 safe ASCII characters without path separators");
         }
     }
 

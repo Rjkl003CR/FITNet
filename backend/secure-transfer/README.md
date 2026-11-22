@@ -102,7 +102,7 @@ The client prints the server-verified SHA-256 after upload and verifies the
 download before writing the destination file. The server stores files in
 `secure-transfer/storage` by default. Override `secure.transfer.port`, `secure.transfer.host`,
 `secure.transfer.storage`, `secure.transfer.keystore`, or
-`secure.transfer.truststore` as needed. Uploads are limited to 100 MiB by default.
+`secure.transfer.truststore` as needed. Uploads are limited to 500 MiB by default.
 
 Run the TLS module and Gateway tests from `backend` with
 `mvn -pl gateway -am test`. Tests start a local TLS server using temporary
@@ -141,7 +141,7 @@ magic (int, FNT1) | version (byte: 2) | operation (byte: 1 upload, 2 download, 3
 ```
 
 In version 2, each text field is an unsigned 16-bit byte length followed by
-strict UTF-8. Filenames are limited to 128 safe ASCII bytes, status messages to
+strict UTF-8. Filenames are limited to 255 safe ASCII bytes, status messages to
 1024 bytes, and SHA-256 values to 64 lowercase hexadecimal bytes. An `UPLOAD`
 request contains filename, signed 64-bit byte length, SHA-256, then exactly that
 many raw file bytes. A `DOWNLOAD` request contains a filename; the response
@@ -189,7 +189,7 @@ then start the TLS server. By default, it loads `.\secure-transfer\certs\server.
 directory). This presentation command sets a 1 MiB server limit so a small
 fixture can demonstrate downstream size rejection; quote JVM `-D` flags in
 PowerShell so dots are not split into separate arguments. Omit
-`"-Dsecure.transfer.max.bytes=1048576"` to use the normal 100 MiB server limit.
+`"-Dsecure.transfer.max.bytes=1048576"` to use the normal 500 MiB server limit.
 
 ```powershell
 $secureKeyPassword = Read-Host "Server keystore password" -AsSecureString
@@ -278,7 +278,7 @@ downloaded bytes before the Gateway sends them to the browser.
 
 ### Demonstrate validation and error responses
 
-The frontend checks unsafe names and files over its 100 MiB limit when you
+The frontend checks unsafe names and files over its 500 MiB limit when you
 submit an upload, before sending them to the Gateway. Use the Gateway API
 directly to demonstrate its HTTP status codes. The following commands use
 Windows `curl.exe` and the same endpoints listed in
@@ -300,7 +300,7 @@ upload temporary file.
 **File over the presentation server limit — expected HTTP 413:**
 
 Create a 1 MiB + 1 byte fixture. The running presentation server was started
-with a 1 MiB limit; the browser's 100 MiB check allows this fixture to reach the
+with a 1 MiB limit; the browser's 500 MiB check allows this fixture to reach the
 Gateway and TLS server.
 
 ```powershell
@@ -324,7 +324,7 @@ curl.exe --silent --show-error --include --request POST `
 
 The server rejects the configured size limit; the Gateway returns HTTP 413.
 The 1 MiB limit is only for this presentation run. Restart the server without
-the `secure.transfer.max.bytes` override to restore its normal 100 MiB limit.
+the `secure.transfer.max.bytes` override to restore its normal 500 MiB limit.
 
 **Missing file — expected HTTP 404:**
 
@@ -421,7 +421,7 @@ mvn -pl secure-transfer "-Dtest=SecureTransferTest#tlsHandshakeCompletesAndServe
   `gateway.frontend.origin` described in the [frontend instructions](../../frontend/src/features/secure-transfer/README.md).
 - **Unexpected 413 in the presentation:** confirm the server was started with
   the temporary 1 MiB override only for the size-rejection demonstration. The
-  normal server default is 100 MiB.
+  normal server default is 500 MiB.
 
 Do not expose this demo Gateway to an untrusted network: it has no user
 authentication, and its browser-facing local endpoint uses HTTP. Use HTTPS in
