@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { parsePresenceUsers, fetchPresenceUsers } from "../../../.next/presence-tests/api.js";
 import { PresenceList } from "../../../.next/presence-tests/PresenceList.js";
 import { PresenceStatus } from "../../../.next/presence-tests/PresenceStatus.js";
+import { filterPresenceUsers, getPresenceCounts } from "../../../.next/presence-tests/presence-utils.js";
 const originalFetch = global.fetch;
 const originalBase = process.env.NEXT_PUBLIC_PRESENCE_API_BASE_URL;
 afterEach(() => {
@@ -76,4 +77,16 @@ test("renders IDs and last-seen dates, sorts online first, and preserves input",
   assert.ok(html.indexOf("student01") < html.indexOf("offline-user"));
   assert.match(html, /dateTime="2026-11-14T10:00:00Z"/);
   assert.equal(users[0].userId, "offline-user");
+});
+test("calculates live statistics and filters real users without mutating them", () => {
+  const users = [
+    { ...user, userId: "student01" },
+    { ...user, userId: "student02", status: "OFFLINE" },
+    { ...user, userId: "peer" },
+  ];
+  assert.deepEqual(getPresenceCounts(users), { total: 3, online: 2, offline: 1 });
+  assert.deepEqual(filterPresenceUsers(users, "STUDENT", "ALL").map((item) => item.userId), ["student01", "student02"]);
+  assert.deepEqual(filterPresenceUsers(users, "", "ONLINE").map((item) => item.userId), ["student01", "peer"]);
+  assert.deepEqual(filterPresenceUsers(users, "student01", "OFFLINE"), []);
+  assert.equal(users.length, 3);
 });
