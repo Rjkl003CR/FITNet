@@ -161,6 +161,31 @@ class GatewayFileTransferTest {
     }
 
     @Test
+    void acceptsLongFilenamesUpTo255CharsWithCommonPunctuation() throws Exception {
+        byte[] content = "long filename test payload".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        String longName = "University Assignment (Final), Version 2 [Submitted] - " + "a".repeat(160) + ".pdf";
+        assertTrue(longName.length() > 128 && longName.length() <= 255);
+        String expectedHash = sha256(content);
+        URI endpoint = URI.create("http://127.0.0.1:" + gateway.getPort() + "/api/files");
+
+        HttpResponse<String> upload = http.send(HttpRequest.newBuilder(endpoint)
+                .header("Origin", "http://localhost:3000")
+                .header("X-Filename", longName)
+                .header("Content-Type", "application/octet-stream")
+                .POST(HttpRequest.BodyPublishers.ofByteArray(content))
+                .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, upload.statusCode(), upload.body());
+
+        String encodedName = java.net.URLEncoder.encode(longName, java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20");
+        HttpResponse<byte[]> download = http.send(HttpRequest.newBuilder(URI.create(endpoint + "/" + encodedName))
+                .header("Origin", "http://localhost:3000")
+                .GET().build(), HttpResponse.BodyHandlers.ofByteArray());
+        assertEquals(200, download.statusCode());
+        assertArrayEquals(content, download.body());
+        assertEquals(expectedHash, download.headers().firstValue("X-File-SHA256").orElseThrow());
+    }
+
+    @Test
     void reportsAbruptDownstreamDisconnectDuringUploadAsBadGatewayNotPayloadTooLarge() throws Exception {
         byte[] payload = new byte[1_048_577];
         for (int i = 0; i < payload.length; i++) payload[i] = (byte) (i * 13);

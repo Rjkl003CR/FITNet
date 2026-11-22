@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public final class SecureTransferServer implements AutoCloseable {
     private static final System.Logger LOG = System.getLogger(SecureTransferServer.class.getName());
     private static final int DEFAULT_PORT = 5004;
-    private static final long DEFAULT_MAX_FILE_BYTES = 100L * 1024 * 1024;
+    private static final long DEFAULT_MAX_FILE_BYTES = 500L * 1024 * 1024;
     private static final int ERROR_DRAIN_BUFFER_SIZE = 8 * 1024;
     private static final long ERROR_DRAIN_MAX_BYTES = 4L * 1024 * 1024;
     private static final long ERROR_DRAIN_MAX_NANOS = TimeUnit.SECONDS.toNanos(1);
@@ -279,9 +279,9 @@ public final class SecureTransferServer implements AutoCloseable {
     }
 
     static void validateFileName(String fileName) throws TransferException {
-        if (fileName == null || !fileName.matches("[A-Za-z0-9][A-Za-z0-9._ -]{0,127}")
+        if (fileName == null || !fileName.matches("[A-Za-z0-9][A-Za-z0-9._ ()\\[\\],&'-]{0,254}")
                 || fileName.equals(".") || fileName.equals("..") || fileName.endsWith(".") || fileName.endsWith(" ")) {
-            throw new TransferException("File name must be 1-128 safe ASCII characters without path separators");
+            throw new TransferException("File name must be 1-255 safe ASCII characters without path separators");
         }
     }
 
