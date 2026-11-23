@@ -1,2 +1,4 @@
 com\fitnet\gateway\GatewayServer.class
-com\fitnet\gateway\GatewayServer$WebSocketConnection.class
+com\fitnet\gateway\GatewayServer$WebSocketServer.class
+com\fitnet\gateway\GatewayServer$SizeLimitedInputStream.class
+com\fitnet\gateway\GatewayServer$PayloadTooLargeException.class

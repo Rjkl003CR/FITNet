@@ -18,6 +18,11 @@
     <dependencies>
         <dependency>
             <groupId>com.fitnet</groupId>
+            <artifactId>tcp-messaging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fitnet</groupId>
             <artifactId>secure-transfer</artifactId>
             <version>${project.version}</version>
         </dependency>
