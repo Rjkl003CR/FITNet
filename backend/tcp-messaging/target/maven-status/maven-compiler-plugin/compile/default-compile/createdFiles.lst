@@ -1,4 +1,5 @@
 com\fitnet\messaging\TcpMessagingClient.class
 com\fitnet\messaging\TcpMessagingServer$MessageJson.class
+com\fitnet\messaging\TcpMessagingClient$PendingWrite.class
 com\fitnet\messaging\TcpMessagingServer.class
-com\fitnet\messaging\TcpMessagingServer$Client.class
+com\fitnet\messaging\TcpMessagingServer$ClientSession.class
